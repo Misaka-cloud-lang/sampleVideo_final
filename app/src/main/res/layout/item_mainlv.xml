@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <cn.jzvd.JzvdStd
+        android:id="@+id/item_main_jzvd"
+        android:layout_width="match_parent"
+        android:layout_height="220dp">
+    </cn.jzvd.JzvdStd>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/item_main_iv"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:src="@mipmap/ic_launcher_round"
+            android:scaleType="centerCrop"/>
+        <TextView
+            android:id="@+id/item_main_tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/item_main_iv"
+            android:text="Misaka"
+            android:layout_marginStart="10dp"
+            android:textStyle="bold"
+            android:textSize="12sp"/>
+
+        <TextView
+            android:id="@+id/item_main_tv_des"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/item_main_tv_name"
+            android:layout_alignStart="@id/item_main_tv_name"
+            android:text="Bbbbbbbbbsssssss"
+            android:textSize="10sp"
+            tools:ignore="SmallSp" />
+
+    </RelativeLayout>
+
+</LinearLayout>
