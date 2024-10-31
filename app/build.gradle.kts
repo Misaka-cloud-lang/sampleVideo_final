@@ -44,3 +44,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.11.0")
     implementation("com.squareup.picasso:picasso:2.5.2")
 }
+dependencies {
+// json 依赖库
+    implementation ("org.json:json:20210307")
+}

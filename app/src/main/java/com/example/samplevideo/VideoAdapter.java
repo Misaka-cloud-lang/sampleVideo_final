@@ -21,6 +21,12 @@ public class VideoAdapter extends BaseAdapter {
     Context context;
     List<VideoBean.ItemListBean> mDatas;
 
+    /**
+     * 构造方法
+     * @param context 上下文（一般就是窗口）
+     * @param mDatas 储存电影数据源的集合（可直接new一个空列表）
+     */
+
     public VideoAdapter(Context context, List<VideoBean.ItemListBean>mDatas){
         this.context = context;
         this.mDatas = mDatas;
@@ -57,6 +63,7 @@ public class VideoAdapter extends BaseAdapter {
         holder.descTv.setText(author.getDescription());
         String iconURL = author.getIcon();
         if(!TextUtils.isEmpty(iconURL)){
+            //icon verified and able to be loaded
             Picasso.with(context).load(iconURL).into(holder.iconIv);
         }
 
