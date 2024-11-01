@@ -2,9 +2,11 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
+
 android {
     namespace = "com.example.samplevideo"
     compileSdk = 34
+
 
     defaultConfig {
         applicationId = "com.example.samplevideo"
@@ -40,11 +42,14 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation(libs.gson)
+    implementation(libs.picasso)
     implementation("cn.jzvd:jiaozivideoplayer:7.7.2.3300")
-    implementation("com.google.code.gson:gson:2.11.0")
-    implementation("com.squareup.picasso:picasso:2.5.2")
 }
-dependencies {
-// json 依赖库
-    implementation ("org.json:json:20210307")
-}
+//configurations.all {
+//    resolutionStrategy.eachDependency { details: DependencyResolveDetails ->
+//        if (details.requested.group == "cn.jzvd" && details.requested.name == "jiaozivideoplayer") {
+//            details.useTarget("${details.requested.group}:${details.requested.name}:${details.requested.version}-sources@jar")
+//        }
+//    }
+//}

@@ -18,6 +18,9 @@ public class VideoBean {
         this.itemList = itemList;
     }
 
+    /**
+     * 一个视频的内容清单
+     */
     public static class ItemListBean {
         /**
          * type : video

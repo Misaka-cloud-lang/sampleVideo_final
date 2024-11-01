@@ -10,6 +10,7 @@ import android.widget.ListView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.samplevideo.utils.HttpUtils;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -24,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 	ListView mainListView;
 	String url =
 		"http://baobab.kaiyanapp.com/api/v4/tabs/selected?udid=11111" + "&vc" + "=168&vn=3.3.1&deviceModel=Huawei6&first_channel" + "=eyepetizer_baidu_market&system_version_code=20";
-	List<VideoBean.ItemListBean> mDatas;
+	//	List<VideoBean.ItemListBean> mDatas;
 	List<JSONObject> movie_infos;
 	private VideoAdapter adapter;
 	Handler handler = new Handler(Looper.getMainLooper(), msg -> {
@@ -51,7 +52,8 @@ public class MainActivity extends AppCompatActivity {
 			for (int i = 0; i < itemList.size(); i++) {
 				VideoBean.ItemListBean listBean = itemList.get(i);
 				if (listBean.getType().equals("video")) {
-					mDatas.add(listBean);
+					adapter.addItemListBean(listBean);
+//					mDatas.add(listBean);
 				}
 			}
 
@@ -69,10 +71,12 @@ public class MainActivity extends AppCompatActivity {
 		setTitle("videos");
 		mainListView = findViewById(R.id.main_lv);
 
-		mDatas = new ArrayList<>();
+//		mDatas = new ArrayList<>();
 
-		adapter = new VideoAdapter(this, mDatas);
+		adapter = new VideoAdapter(this, new ArrayList<>());
 		mainListView.setAdapter(adapter);
+
+
 
 		loadAllMetaData();
 	}

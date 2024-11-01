@@ -1,4 +1,4 @@
-package com.example.samplevideo;
+package com.example.samplevideo.utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
