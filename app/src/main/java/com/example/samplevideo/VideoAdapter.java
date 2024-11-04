@@ -110,7 +110,7 @@ public class VideoAdapter extends BaseAdapter {
 
 		//播放网址
 		String str_playUrl = dataBean.getPlayUrl();
-		Log.i(TAG, "loading playUrl: " + str_playUrl);
+		Log.i(TAG, controller.count+"loading playUrl: " + str_playUrl);
 		//视频标题
 		String str_title = dataBean.getTitle();
 //		Log.i(TAG, "loading title: " + str_title);
@@ -122,6 +122,8 @@ public class VideoAdapter extends BaseAdapter {
 //		Log.i(TAG, "loading thumbUrl: " + thumbUrl);
 		Picasso.with(context).load(thumbUrl).into(controller.jzvdStd.posterImageView);
 		controller.jzvdStd.positionInList = position;
+//
+		controller.jzvdStd.startVideo(true);
 
 		return convertView;
 	}
@@ -149,12 +151,13 @@ public class VideoAdapter extends BaseAdapter {
 		GFVD jzvdStd;
 		ImageView iconIv;
 		TextView nameTv, descTv;
-
+		public final int count;
 		public ViewController(View view, int count) {
 			jzvdStd = view.findViewById(R.id.item_main_gfvd);
 			iconIv = view.findViewById(R.id.item_main_iv);
 			nameTv = view.findViewById(R.id.item_main_tv_name);
 			descTv = view.findViewById(R.id.item_main_tv_des);
+			this.count = count;
 			jzvdStd.setAdapter(VideoAdapter.this);
 			jzvdStd.setPosition(count);
 			vdPositions.put(count, jzvdStd);
