@@ -41,6 +41,10 @@ public class GFVD extends JzvdStd {
 	@Override
 	public void onClick(View v) {
 		super.onClick(v);
+		if (v.getId() == cn.jzvd.R.id.start && adapter != null) {
+			// 调用适配器中的预缓冲方法
+			adapter.preloadNextVideo(position);
+		}
 	}
 
 	@Override
@@ -63,19 +67,15 @@ public class GFVD extends JzvdStd {
 
 	@Override
 	public void startVideo() {
-		super.startVideo();
+		startVideo(false);
 	}
 
 	public void startVideo(boolean notified) {
-//		super.startVideo();
+		super.startVideo();
 		Log.i(TAG, "startVideo: "+position);
-		if (notified) {
-			registerWifiListener(super.getContext());
-			return;
-		}
+		if (notified) return;
 		Log.i(TAG,
 			"startVideo: notifying neighbors from " + position);
 		adapter.NotifyNeighbors(this);
 	}
-
 }

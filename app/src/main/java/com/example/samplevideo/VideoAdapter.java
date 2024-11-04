@@ -1,6 +1,7 @@
 package com.example.samplevideo;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import com.example.samplevideo.extensions.GFVD;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +39,43 @@ public class VideoAdapter extends BaseAdapter {
 	private final Map<Integer, VideoBean.ItemListBean> itemPositions;
 	private final Map<Integer, GFVD> vdPositions;
 	Context context;
+
+
+	private MediaPlayer preloadedMediaPlayer;
+	private String nextVideoUrl;
+
+	// 预加载下一个视频的缓冲数据
+	// 在设置数据源前确保释放上一个 MediaPlayer
+    public void preloadNextVideo(int currentPosition) {
+		releasePreloadedMediaPlayer(); // 先释放之前的 MediaPlayer
+
+		int nextPosition = currentPosition + 1;
+		if (nextPosition >= mDatas.size()) return;
+
+		VideoBean.ItemListBean nextVideo = mDatas.get(nextPosition);
+		nextVideoUrl = nextVideo.getData().getPlayUrl();
+
+		try {
+			preloadedMediaPlayer = new MediaPlayer();  // 每次新建一个实例
+			preloadedMediaPlayer.setDataSource(nextVideoUrl);
+			preloadedMediaPlayer.setOnPreparedListener(mp -> Log.i(TAG, "下一个视频已预加载完毕"));
+			preloadedMediaPlayer.prepareAsync();  // 异步加载下一个视频
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	// 释放预缓冲的 MediaPlayer
+    public void releasePreloadedMediaPlayer() {
+		if (preloadedMediaPlayer != null) {
+			preloadedMediaPlayer.release();
+			preloadedMediaPlayer = null;
+		}
+	}
+
+
+
 
 	/**
 	 * 构造方法
@@ -79,51 +118,30 @@ public class VideoAdapter extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewController controller;
 		if (convertView == null) {
-			convertView =
-				LayoutInflater.from(context).inflate(R.layout.item_mainlistview, parent, false);
+			convertView = LayoutInflater.from(context).inflate(R.layout.item_mainlistview, parent, false);
 			controller = new ViewController(convertView, position);
 			convertView.setTag(controller);
 		} else {
 			controller = (ViewController) convertView.getTag();
 		}
-//		Log.i(TAG, "-----------------------------" + convertView.getClass());
-//		Log.i(TAG, "sending view in class" + convertView.getClass());
-//		Log.i(TAG, "getView: parent class" + parent.getClass());
-//		Log.i(TAG, "position: " + position);
 
-		//加载视频下方注解文字
-		VideoBean.ItemListBean.DataBean dataBean =
-			mDatas.get(position).getData();
-		VideoBean.ItemListBean.DataBean.AuthorBean author =
-			dataBean.getAuthor();
+		VideoBean.ItemListBean.DataBean dataBean = mDatas.get(position).getData();
+		VideoBean.ItemListBean.DataBean.AuthorBean author = dataBean.getAuthor();
 		controller.nameTv.setText(author.getName());
 		controller.descTv.setText(author.getDescription());
-		String message = String.format("Loading author: %s __ %s",
-			author.getName(), author.getDescription());
-//		Log.i(TAG, message);
 
-		//加载视频作者头像
 		String iconURL = author.getIcon();
 		if (!TextUtils.isEmpty(iconURL)) {
 			Picasso.with(context).load(iconURL).into(controller.iconIv);
 		}
 
-		//播放网址
-		String str_playUrl = dataBean.getPlayUrl();
-		Log.i(TAG, controller.count+"loading playUrl: " + str_playUrl);
-		//视频标题
-		String str_title = dataBean.getTitle();
-//		Log.i(TAG, "loading title: " + str_title);
-		controller.jzvdStd.setUp(str_playUrl, str_title,
-			Jzvd.SCREEN_FULLSCREEN);
+		String playUrl = dataBean.getPlayUrl();
+		String title = dataBean.getTitle();
+		controller.jzvdStd.setUp(playUrl, title, Jzvd.SCREEN_FULLSCREEN);
 
-		//加载视频预览图片
 		String thumbUrl = dataBean.getCover().getFeed();
-//		Log.i(TAG, "loading thumbUrl: " + thumbUrl);
 		Picasso.with(context).load(thumbUrl).into(controller.jzvdStd.posterImageView);
 		controller.jzvdStd.positionInList = position;
-//
-		controller.jzvdStd.startVideo(true);
 
 		return convertView;
 	}
@@ -140,7 +158,7 @@ public class VideoAdapter extends BaseAdapter {
 					"NotifyNeighbors: position not found at " + neighbor_position);
 				return;
 			}
-			gfvd.startVideo(true);
+		//	gfvd.startVideo(true);
 		}
 	}
 
