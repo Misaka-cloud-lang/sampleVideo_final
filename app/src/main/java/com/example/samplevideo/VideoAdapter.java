@@ -1,6 +1,7 @@
 package com.example.samplevideo;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,12 +14,13 @@ import android.widget.TextView;
 import com.example.samplevideo.extensions.GFVD;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import cn.jzvd.Jzvd;
-
+import cn.jzvd.JzvdStd;
 
 public class VideoAdapter extends BaseAdapter {
 	final String TAG =
@@ -38,6 +40,43 @@ public class VideoAdapter extends BaseAdapter {
 	private final Map<Integer, GFVD> vdPositions;
 	Context context;
 
+
+	private MediaPlayer preloadedMediaPlayer;
+	private String nextVideoUrl;
+
+	// 预加载下一个视频的缓冲数据
+	// 在设置数据源前确保释放上一个 MediaPlayer
+    public void preloadNextVideo(int currentPosition) {
+		releasePreloadedMediaPlayer(); // 先释放之前的 MediaPlayer
+
+		int nextPosition = currentPosition + 1;
+		if (nextPosition >= mDatas.size()) return;
+
+		VideoBean.ItemListBean nextVideo = mDatas.get(nextPosition);
+		nextVideoUrl = nextVideo.getData().getPlayUrl();
+
+		try {
+			preloadedMediaPlayer = new MediaPlayer();  // 每次新建一个实例
+			preloadedMediaPlayer.setDataSource(nextVideoUrl);
+			preloadedMediaPlayer.setOnPreparedListener(mp -> Log.i(TAG, "下一个视频已预加载完毕"));
+			preloadedMediaPlayer.prepareAsync();  // 异步加载下一个视频
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	// 释放预缓冲的 MediaPlayer
+    public void releasePreloadedMediaPlayer() {
+		if (preloadedMediaPlayer != null) {
+			preloadedMediaPlayer.release();
+			preloadedMediaPlayer = null;
+		}
+	}
+
+
+
+
 	/**
 	 * 构造方法
 	 *
@@ -50,6 +89,7 @@ public class VideoAdapter extends BaseAdapter {
 		this.cachedProgress = new HashMap<>();
 		this.itemPositions = new HashMap<>();
 		this.vdPositions = new HashMap<>();
+		this.preloadedMediaPlayer = new MediaPlayer();  // 初始化 MediaPlayer
 	}
 
 	public void addItemListBean(VideoBean.ItemListBean itemListBean) {
@@ -92,8 +132,7 @@ public class VideoAdapter extends BaseAdapter {
 //		Log.i(TAG, "position: " + position);
 
 		//加载视频下方注解文字
-		VideoBean.ItemListBean.DataBean dataBean =
-			mDatas.get(position).getData();
+		VideoBean.ItemListBean.DataBean dataBean = mDatas.get(position).getData();
 		VideoBean.ItemListBean.DataBean.AuthorBean author =
 			dataBean.getAuthor();
 		controller.nameTv.setText(author.getName());
@@ -138,7 +177,7 @@ public class VideoAdapter extends BaseAdapter {
 					"NotifyNeighbors: position not found at " + neighbor_position);
 				return;
 			}
-			gfvd.startVideo(true);
+			//gfvd.startVideo(true);
 		}
 	}
 
@@ -149,12 +188,13 @@ public class VideoAdapter extends BaseAdapter {
 		GFVD jzvdStd;
 		ImageView iconIv;
 		TextView nameTv, descTv;
-
+		public final int count;
 		public ViewController(View view, int count) {
 			jzvdStd = view.findViewById(R.id.item_main_gfvd);
 			iconIv = view.findViewById(R.id.item_main_iv);
 			nameTv = view.findViewById(R.id.item_main_tv_name);
 			descTv = view.findViewById(R.id.item_main_tv_des);
+			this.count = count;
 			jzvdStd.setAdapter(VideoAdapter.this);
 			jzvdStd.setPosition(count);
 			vdPositions.put(count, jzvdStd);

@@ -41,6 +41,10 @@ public class GFVD extends JzvdStd {
 	@Override
 	public void onClick(View v) {
 		super.onClick(v);
+		if (v.getId() == cn.jzvd.R.id.start && adapter != null) {
+			// 调用适配器中的预缓冲方法
+			adapter.preloadNextVideo(position);
+		}
 //		int i = v.getId();
 //		if (i == R.id.poster) {
 //			Log.i(TAG, "onClick: poster");
