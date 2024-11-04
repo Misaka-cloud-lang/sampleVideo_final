@@ -61,7 +61,10 @@ public class VideoBean {
             private AuthorBean author;
             private CoverBean cover;
             private String playUrl;
-
+            private int duration;//总时长
+            private int playedDuration; // 实际播放时长
+            private boolean played;
+            private Object lastViewTime;
             public String getDataType() {
                 return dataType;
             }
@@ -111,6 +114,37 @@ public class VideoBean {
                 this.playUrl = playUrl;
             }
 
+            public int getDuration() {
+                return duration;
+            }
+
+            public void setDuration(int duration) {
+                this.duration = duration;
+            }
+
+            public boolean isPlayed() {
+                return played;
+            }
+
+            public void setPlayed(boolean played) {
+                this.played = played;
+            }
+
+            public Object getLastViewTime() {
+                return lastViewTime;
+            }
+
+            public void setLastViewTime(Object lastViewTime) {
+                this.lastViewTime = lastViewTime;
+            }
+
+            public int getPlayedDuration() {
+                return playedDuration;
+            }
+
+            public void setPlayedDuration(int playedDuration) {
+                this.playedDuration = playedDuration;
+            }
 
             public static class ConsumptionBean {
             }

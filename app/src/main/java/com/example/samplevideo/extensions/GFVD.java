@@ -13,6 +13,11 @@ public class GFVD extends JzvdStd {
 	final String TAG = "GOLDFISH";
 	private VideoAdapter adapter;
 	private int position = -1;
+	private OnPlaybackListener playbackListener;
+
+	public void setOnPlaybackListener(OnPlaybackListener listener) {
+		this.playbackListener = listener;
+	}
 
 	public GFVD(Context context) {
 		super(context);
@@ -41,23 +46,6 @@ public class GFVD extends JzvdStd {
 	@Override
 	public void onClick(View v) {
 		super.onClick(v);
-//		int i = v.getId();
-//		if (i == R.id.poster) {
-//			Log.i(TAG, "onClick: poster");
-//		} else if (i == R.id.surface_container) {
-//			Log.i(TAG, "onClick: surface_container");
-//			if (clarityPopWindow != null) {
-//				Log.i(TAG, "onClick: clarityPopWindow");
-//			}
-//		} else if (i == R.id.back) {
-//			Log.i(TAG, "onClick: back");
-//		} else if (i == R.id.back_tiny) {
-//			Log.i(TAG, "onClick: back_tiny");
-//		} else if (i == R.id.clarity) {
-//			Log.i(TAG, "onClick: clarity");
-//		} else if (i == R.id.retry_btn) {
-//			Log.i(TAG, "onClick: retry_btn");
-//		}
 	}
 
 	@Override
@@ -70,25 +58,55 @@ public class GFVD extends JzvdStd {
 	public void onStatePreparing() {
 		super.onStatePreparing();
 		Log.i(TAG, position + "onStatePreparing: ");
+
 	}
 
 	@Override
 	public void onStatePlaying() {
 		super.onStatePlaying();
 		Log.i(TAG, position + "onStatePlaying: ");
+		if (playbackListener != null) {
+			playbackListener.onPlaybackStarted();
+		}
+	}
+	@Override
+	public void onStatePause() {
+		super.onStatePause();
+		Log.i(TAG, position + "onStatePause: ");
+		if (playbackListener != null) {
+			long playedDuration = getCurrentPositionWhenPlaying();
+			Log.i(TAG, position + "onStatePause: playedDuration = " + playedDuration + " ms");
+			playbackListener.onPlaybackPaused(playedDuration);
+		}
+	}
+
+	@Override
+	public void onStateAutoComplete() {
+		super.onStateAutoComplete();
+		Log.i(TAG, position + "onStateAutoComplete: ");
+		if (playbackListener != null) {
+			long playedDuration = getCurrentPositionWhenPlaying();
+			Log.i(TAG, position + "onStateAutoComplete: playedDuration = " + playedDuration + " ms");
+			playbackListener.onPlaybackEnded(playedDuration);
+		}
 	}
 
 	@Override
 	public void startVideo() {
-		startVideo(false);
+		super.startVideo();
 	}
 
 	public void startVideo(boolean notified) {
-		super.startVideo();
+//		super.startVideo();
 		Log.i(TAG, "startVideo: "+position);
-		if (notified) return;
+		if (notified) {
+			registerWifiListener(super.getContext());
+			return;
+		}
 		Log.i(TAG,
-			"startVideo: notifying neighbors from " + position);
+				"startVideo: notifying neighbors from " + position);
 		adapter.NotifyNeighbors(this);
 	}
+
+
 }
