@@ -11,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.samplevideo.extensions.GFVD;
-import com.example.samplevideo.extensions.OnPlaybackListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
@@ -24,7 +23,7 @@ import cn.jzvd.Jzvd;
 public class VideoAdapter extends BaseAdapter {
 	final String TAG =
 //		VideoAdapter.class.getSimpleName()
-			"GOLDFISH";
+		"GOLDFISH";
 	/**
 	 * 点击一个视频的播放键时，前后多少个视频要开始加载<br/>
 	 * 即：点击位置为{@code position}的视频，[{@code position-NEIGHBOR_FRONT},{@code
@@ -37,7 +36,6 @@ public class VideoAdapter extends BaseAdapter {
 	private final Map<VideoBean.ItemListBean, Integer> cachedProgress;
 	private final Map<Integer, VideoBean.ItemListBean> itemPositions;
 	private final Map<Integer, GFVD> vdPositions;
-	private GFVD currentPlayingVd;//追踪当前视频
 	Context context;
 
 	/**
@@ -82,7 +80,7 @@ public class VideoAdapter extends BaseAdapter {
 		ViewController controller;
 		if (convertView == null) {
 			convertView =
-					LayoutInflater.from(context).inflate(R.layout.item_mainlistview, parent, false);
+				LayoutInflater.from(context).inflate(R.layout.item_mainlistview, parent, false);
 			controller = new ViewController(convertView, position);
 			convertView.setTag(controller);
 		} else {
@@ -95,13 +93,13 @@ public class VideoAdapter extends BaseAdapter {
 
 		//加载视频下方注解文字
 		VideoBean.ItemListBean.DataBean dataBean =
-				mDatas.get(position).getData();
+			mDatas.get(position).getData();
 		VideoBean.ItemListBean.DataBean.AuthorBean author =
-				dataBean.getAuthor();
+			dataBean.getAuthor();
 		controller.nameTv.setText(author.getName());
 		controller.descTv.setText(author.getDescription());
 		String message = String.format("Loading author: %s __ %s",
-				author.getName(), author.getDescription());
+			author.getName(), author.getDescription());
 //		Log.i(TAG, message);
 
 		//加载视频作者头像
@@ -112,20 +110,18 @@ public class VideoAdapter extends BaseAdapter {
 
 		//播放网址
 		String str_playUrl = dataBean.getPlayUrl();
-		Log.i(TAG, controller.count+"loading playUrl: " + str_playUrl);
+		Log.i(TAG, "loading playUrl: " + str_playUrl);
 		//视频标题
 		String str_title = dataBean.getTitle();
 //		Log.i(TAG, "loading title: " + str_title);
 		controller.jzvdStd.setUp(str_playUrl, str_title,
-				Jzvd.SCREEN_FULLSCREEN);
+			Jzvd.SCREEN_FULLSCREEN);
 
 		//加载视频预览图片
 		String thumbUrl = dataBean.getCover().getFeed();
 //		Log.i(TAG, "loading thumbUrl: " + thumbUrl);
 		Picasso.with(context).load(thumbUrl).into(controller.jzvdStd.posterImageView);
 		controller.jzvdStd.positionInList = position;
-//
-		controller.jzvdStd.startVideo(true);
 
 		return convertView;
 	}
@@ -139,7 +135,7 @@ public class VideoAdapter extends BaseAdapter {
 			GFVD gfvd = vdPositions.get(neighbor_position);
 			if (gfvd == null) {
 				Log.w(TAG,
-						"NotifyNeighbors: position not found at " + neighbor_position);
+					"NotifyNeighbors: position not found at " + neighbor_position);
 				return;
 			}
 			gfvd.startVideo(true);
@@ -153,46 +149,16 @@ public class VideoAdapter extends BaseAdapter {
 		GFVD jzvdStd;
 		ImageView iconIv;
 		TextView nameTv, descTv;
-		public final int count;
 
 		public ViewController(View view, int count) {
 			jzvdStd = view.findViewById(R.id.item_main_gfvd);
 			iconIv = view.findViewById(R.id.item_main_iv);
 			nameTv = view.findViewById(R.id.item_main_tv_name);
 			descTv = view.findViewById(R.id.item_main_tv_des);
-			this.count = count;
 			jzvdStd.setAdapter(VideoAdapter.this);
 			jzvdStd.setPosition(count);
 			vdPositions.put(count, jzvdStd);
-			// 设置监听器
-			jzvdStd.setOnPlaybackListener(new OnPlaybackListener() {
-				@Override
-				public void onPlaybackStarted() {
-					Log.i(TAG, "Video started playing at position: " + count);
-					if (currentPlayingVd != null && currentPlayingVd != jzvdStd) {
-						// 暂停当前正在播放的视频
-						currentPlayingVd.onStatePause();
-						long playedDuration = currentPlayingVd.getCurrentPositionWhenPlaying();
-						Log.i(TAG, "Previous video paused at position: " + currentPlayingVd.getPosition() + ", played duration: " + playedDuration + " ms");
-						cachedProgress.put(mDatas.get(currentPlayingVd.getPosition()), (int) playedDuration);
-					}
-					currentPlayingVd = jzvdStd;
-				}
 
-				@Override
-				public void onPlaybackPaused(long playedDuration) {
-					Log.i(TAG, "Video paused at position: " + count + ", played duration: " + playedDuration + " ms");
-					// 更新播放时长
-					cachedProgress.put(mDatas.get(count), (int) playedDuration);
-				}
-
-				@Override
-				public void onPlaybackEnded(long playedDuration) {
-					Log.i(TAG, "Video ended playing at position: " + count + ", played duration: " + playedDuration + " ms");
-					// 更新播放时长
-					cachedProgress.put(mDatas.get(count), (int) playedDuration);
-				}
-			});
 		}
 	}
 }
