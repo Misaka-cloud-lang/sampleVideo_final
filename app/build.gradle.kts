@@ -43,4 +43,5 @@ dependencies {
     implementation("cn.jzvd:jiaozivideoplayer:7.7.2.3300")
     implementation("com.google.code.gson:gson:2.11.0")
     implementation("com.squareup.picasso:picasso:2.5.2")
+    implementation("com.squareup.picasso:picasso:2.71828")
 }
